@@ -1,0 +1,1248 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>경희 라피엘 한의원 · 치료 현황판</title>
+<style>
+  :root{
+    --burgundy-deep: #4A0F25;
+    --burgundy: #7A1F3D;
+    --rose-light: #F0D9C8;
+    --rose-mid: #C8A882;
+    --rose-dark: #B08060;
+    --ivory: #FAF6F0;
+    --ivory-card: #FFFDFB;
+    --text-main: #3A1420;
+    --text-sub: #8A6A5A;
+    --muted: #C9BEB4;
+    --doc-k: #7A1F3D;
+    --doc-j: #C1652F;
+    --doc-c: #2F6B5E;
+    --inactive-bg: #E9E1D6;
+    --inactive-border: #D3C3AF;
+  }
+  *{box-sizing:border-box;}
+  html,body{ height:100%; }
+  body{
+    margin:0;
+    background:var(--ivory);
+    font-family:'Noto Sans KR', sans-serif;
+    color:var(--text-main);
+    padding:16px 20px;
+    font-size:16px;
+    display:flex;
+    flex-direction:column;
+  }
+  header{
+    display:flex;
+    align-items:baseline;
+    justify-content:space-between;
+    margin-bottom:10px;
+  }
+  h1{
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:800;
+    font-size:24px;
+    color:var(--burgundy-deep);
+    margin:0;
+    letter-spacing:-0.02em;
+  }
+  .sync-note{ font-size:13px; color:var(--text-sub); }
+
+  .col-headers{
+    display:grid;
+    grid-template-columns: 48px 130px 100px 108px 2.3fr 0.85fr 1.2fr 60px;
+    gap:14px;
+    padding:0 12px 5px 12px;
+  }
+  .col-headers > div{ font-size:13.5px; color:var(--text-sub); font-weight:700; text-align:center; }
+  .col-headers .big{ font-size:15px; font-weight:800; }
+  .col-headers .h-before{ color:var(--burgundy); }
+  .col-headers .h-during{ color:var(--rose-dark); }
+  .col-headers .h-done{ color:#8C7E71; }
+
+  .board{ display:flex; flex-direction:column; gap:6px; }
+
+  /* 활성 베드 */
+  .bed-row{
+    background:var(--ivory-card);
+    border:2px solid var(--rose-dark);
+    box-shadow:0 2px 8px rgba(74,15,37,0.06);
+    border-radius:12px;
+    display:grid;
+    grid-template-columns: 48px 130px 100px 108px 2.3fr 0.85fr 1.2fr 60px;
+    gap:14px;
+    align-items:stretch;
+    padding:8px 12px;
+  }
+
+  /* 비활성 베드: 얇은 바 하나로 접힘 */
+  .bed-row.inactive{
+    background:var(--inactive-bg);
+    border:1.5px dashed var(--inactive-border);
+    box-shadow:none;
+    grid-template-columns: 48px 1fr;
+    padding:5px 12px;
+    cursor:pointer;
+  }
+  .bed-row.inactive:hover{ background:#E2D8C9; }
+  .inactive-label{
+    display:flex;
+    align-items:center;
+    font-size:14px;
+    font-weight:700;
+    color:var(--text-sub);
+  }
+
+  .bed-num{ display:flex; align-items:center; justify-content:center; }
+  .bed-num-badge{
+    width:42px;height:42px;
+    border-radius:50%;
+    border:2.5px solid var(--rose-dark);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Noto Sans KR', sans-serif;
+    font-weight:800;
+    font-size:17px;
+    color:var(--burgundy-deep);
+    background:var(--ivory);
+    cursor:pointer;
+    transition:transform .12s ease;
+    flex-shrink:0;
+  }
+  .bed-num-badge:hover{ transform:scale(1.07); }
+  .bed-num-badge.on{
+    background:var(--burgundy-deep);
+    color:#fff;
+    border-color:var(--burgundy-deep);
+  }
+
+  .patient-cell{ display:flex; align-items:center; justify-content:center; }
+  .patient-input{
+    border:none;
+    background:transparent;
+    font-size:19px;
+    font-weight:800;
+    color:var(--text-main);
+    padding:5px 2px;
+    border-bottom:1.5px solid #EADCCB;
+    width:100%;
+    text-align:center;
+  }
+  .patient-input:focus{ outline:none; border-bottom-color:var(--rose-dark); }
+  .patient-input::placeholder{ color:var(--muted); font-weight:500; }
+
+  .region-cell{ display:flex; align-items:center; justify-content:center; }
+  .region-input{
+    border:none;
+    background:transparent;
+    font-size:16px;
+    font-weight:700;
+    color:var(--text-main);
+    padding:5px 2px;
+    border-bottom:1.5px solid #EADCCB;
+    width:100%;
+    text-align:center;
+  }
+  .region-input:focus{ outline:none; border-bottom-color:var(--rose-dark); }
+  .region-input::placeholder{ color:var(--muted); font-weight:500; }
+
+  .doctor-cell{ display:flex; align-items:center; justify-content:center; padding:0 10px; }
+  .doctor-group{ display:flex; gap:5px; }
+  .btn-doctor{
+    width:36px;height:36px;
+    border-radius:50%;
+    border:2px solid var(--dcolor);
+    background:#fff;
+    color:var(--dcolor);
+    font-size:15px;
+    font-weight:800;
+    cursor:pointer;
+  }
+  .btn-doctor.sel{ background:var(--dcolor); color:#fff; }
+
+  .zone{
+    border-radius:9px;
+    padding:6px;
+    min-height:48px;
+    display:flex;
+    flex-direction:column;
+    gap:5px;
+    border:1.5px dashed transparent;
+    justify-content:center;
+  }
+  .zone[data-status="before"]{ background:#F7F2EC; }
+  .zone[data-status="during"]{ background:#FBF0E6; }
+  .zone[data-status="done"]{ background:#F2ECE5; }
+  .zone.drag-over{ border-color:var(--rose-dark); background:#FFF9F2; }
+
+  .chip-row{ display:flex; flex-wrap:wrap; align-items:center; gap:6px; }
+
+  .btn-quick{
+    flex:0 0 auto;
+    height:42px;
+    border:1.5px solid var(--tcolor);
+    color:var(--tcolor);
+    background:#fff;
+    border-radius:16px;
+    font-size:15px;
+    font-weight:700;
+    padding:0 16px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-quick:hover{ background:var(--tcolor); color:#fff; }
+
+  .chip{
+    display:flex;
+    align-items:center;
+    height:42px;
+    gap:7px;
+    padding:0 14px;
+    border-radius:18px;
+    font-size:15.5px;
+    font-weight:700;
+    cursor:grab;
+    user-select:none;
+    color:#fff;
+    background:var(--tcolor);
+    white-space:nowrap;
+  }
+  .chip.dragging{ opacity:0.35; }
+  .chip .del{ cursor:pointer; opacity:0.8; font-size:13px; padding:4px 4px; }
+  .chip .del:hover{ opacity:1; }
+
+  .chip-split{
+    display:flex;
+    align-items:stretch;
+    height:42px;
+    padding:0;
+    border-radius:18px;
+    overflow:hidden;
+    cursor:grab;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .chip-split .chip-label{
+    background:var(--tcolor);
+    color:#fff;
+    font-weight:700;
+    font-size:15px;
+    padding:0 12px;
+    display:flex;
+    align-items:center;
+    white-space:nowrap;
+    user-select:none;
+    -webkit-user-select:none;
+  }
+  .chip-split input{
+    border:none;
+    background:#fff;
+    font-size:14px;
+    padding:0 7px;
+    min-width:38px;
+    width:52px;
+    color:var(--text-main);
+  }
+  .chip-split input:focus{ outline:none; background:#FFF6EC; }
+  .chip-split input + input{ border-left:1px solid #EFE3D6; }
+  .chip-split .del{
+    background:#fff;
+    display:flex;
+    align-items:center;
+    padding:0 13px;
+    cursor:pointer;
+    color:var(--text-sub);
+    font-size:13px;
+    border-left:1px solid #EFE3D6;
+  }
+  .chip-split .del:hover{ color:var(--burgundy); }
+
+  .reset-cell{ display:flex; align-items:center; }
+  .btn-reset{
+    width:100%;
+    border:1.5px solid #D8C9BB;
+    background:transparent;
+    color:var(--text-sub);
+    border-radius:8px;
+    font-size:13px;
+    font-weight:700;
+    padding:9px 2px;
+    cursor:pointer;
+  }
+  .btn-reset:hover{ border-color:var(--burgundy); color:#fff; background:var(--burgundy); }
+
+  .legend{
+    margin-top:8px;
+    display:flex;
+    gap:16px;
+    font-size:13px;
+    color:var(--text-sub);
+    flex-wrap:wrap;
+  }
+
+  .waiting-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin:18px 0 8px 0;
+  }
+  .waiting-header h2{
+    font-family:'Noto Sans KR', sans-serif;
+    font-size:18px;
+    font-weight:800;
+    color:var(--burgundy-deep);
+    margin:0;
+  }
+  .btn-add-waiting{
+    border:1.5px solid var(--burgundy-deep);
+    background:var(--burgundy-deep);
+    color:#fff;
+    border-radius:8px;
+    font-size:14px;
+    font-weight:700;
+    padding:9px 16px;
+    cursor:pointer;
+  }
+  .btn-add-waiting:hover{ background:var(--burgundy); }
+
+  .waiting-row{
+    background:var(--ivory-card);
+    border:2px dashed var(--rose-mid);
+    border-radius:12px;
+    display:grid;
+    grid-template-columns: 40px 130px 100px 108px 1fr 150px;
+    gap:14px;
+    align-items:stretch;
+    padding:8px 12px;
+  }
+  .waiting-actions{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    justify-content:center;
+  }
+  .btn-copy{
+    border:1.5px solid var(--burgundy-deep);
+    background:transparent;
+    color:var(--burgundy-deep);
+    border-radius:8px;
+    font-size:12px;
+    font-weight:700;
+    padding:7px 6px;
+    cursor:pointer;
+    white-space:nowrap;
+  }
+  .btn-copy:hover{ background:var(--burgundy-deep); color:#fff; }
+
+  #toast{
+    position:fixed;
+    left:50%;
+    bottom:32px;
+    transform:translateX(-50%) translateY(20px);
+    background:var(--burgundy-deep);
+    color:#fff;
+    font-weight:700;
+    font-size:14px;
+    padding:12px 22px;
+    border-radius:999px;
+    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .2s ease, transform .2s ease;
+    z-index:9999;
+  }
+  #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+  .waiting-handle{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:20px;
+    color:var(--rose-dark);
+    cursor:grab;
+    touch-action:none;
+    user-select:none;
+  }
+  .bed-num-badge.drop-target{
+    background:var(--rose-dark) !important;
+    color:#fff !important;
+    transform:scale(1.15);
+  }
+  .waiting-treat-zone{ display:flex; flex-direction:column; gap:5px; justify-content:center; }
+
+  .bed-row.drop-target{
+    border-color:var(--burgundy-deep) !important;
+    background:#FFF3E8 !important;
+    box-shadow:0 0 0 3px rgba(122,31,61,0.18);
+  }
+
+  .drag-ghost{
+    position:fixed;
+    z-index:9999;
+    pointer-events:none;
+    transform:translate(-50%,-140%);
+    background:var(--burgundy-deep);
+    color:#fff;
+    font-weight:800;
+    font-size:14px;
+    padding:8px 14px;
+    border-radius:14px;
+    box-shadow:0 6px 16px rgba(0,0,0,0.25);
+    white-space:nowrap;
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+<header>
+  <h1>치료 현황판</h1>
+  <div class="sync-note" id="syncNote">불러오는 중…</div>
+</header>
+
+<div class="col-headers">
+  <div>베드</div>
+  <div>환자명</div>
+  <div>부위</div>
+  <div>담당</div>
+  <div>치료 전</div>
+  <div>치료 중</div>
+  <div>치료 완료</div>
+  <div>초기화</div>
+</div>
+
+<div class="board" id="board"></div>
+
+<div class="waiting-header">
+  <h2>대기 환자</h2>
+  <button class="btn-add-waiting" id="addWaitingBtn">+ 대기 환자 추가</button>
+</div>
+<div class="board" id="waitingBoard"></div>
+
+<div class="legend">
+  <span>· 회색 점선 바 = 비활성 베드, 클릭하면 시작</span>
+  <span>· 칩 드래그로 이동/순서 변경</span>
+  <span>· 대기 환자 왼쪽 손잡이(⠿)를 베드 번호로 끌면 그 베드에 배정</span>
+</div>
+
+<script>
+// ↓↓↓ Supabase 프로젝트 정보로 교체하세요 (Settings → API) ↓↓↓
+const SUPABASE_URL = 'https://bvniztqmmjggmmtnkzic.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2bml6dHFtbWpnZ21tdG5remljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODEzMTgsImV4cCI6MjA5ODQ1NzMxOH0.KETeV-bEpHDzpUgPRdchqHDhuRh6EMJacDNrUu_gA8A';
+const ROW_ID = 'main';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+const BED_COUNT = 14;
+const DOCTORS = [
+  { id:'K', color:'var(--doc-k)' },
+  { id:'J', color:'var(--doc-j)' },
+  { id:'C', color:'var(--doc-c)' },
+];
+
+const TREATMENT_ORDER = ['JB','돔','핫팩','I','약침','침','침(전)','건부','습부1','습부2','추나','추나(환자복)','충격파'];
+const TREATMENT_COLORS = {
+  'JB':'#8E6C88', '돔':'#5C6B8A', '핫팩':'#C1652F', 'I':'#4C7A96', '약침':'#7A1F3D',
+  '침':'#2F6B5E', '침(전)':'#2F6B5E',
+  '건부':'#8AA624', '습부1':'#8AA624', '습부2':'#8AA624',
+  '추나':'#B08060', '추나(환자복)':'#B08060', '충격파':'#4A0F25'
+};
+const FORM_CONFIG = {
+  '핫팩': ['부위'],
+  'I': ['부위'],
+  '약침': ['종류','cc','개수']
+};
+const DEFAULT_ON_ACTIVATE = ['핫팩','I','침(전)','습부2'];
+
+function emptyBed(id){
+  return { id, active:false, patient:'', region:'', doctor:null, treatments:[] };
+}
+function defaultState(){
+  const beds = [];
+  for(let i=1;i<=BED_COUNT;i++) beds.push(emptyBed(i));
+  return beds;
+}
+
+let state = defaultState();
+let waitingList = [];
+let seq = 1;
+function newId(){ return 't' + (seq++) + '-' + Date.now(); }
+const __measureCanvas = document.createElement('canvas');
+function autoGrowInput(inp){
+  const ctx = __measureCanvas.getContext('2d');
+  const cs = getComputedStyle(inp);
+  ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const text = inp.value || inp.placeholder || '';
+  const textWidth = ctx.measureText(text).width;
+  inp.style.width = Math.max(38, textWidth + 22) + 'px';
+}
+function emptyWaitingPatient(){
+  const w = { id:newId(), patient:'', region:'', doctor:null, treatments:[] };
+  DEFAULT_ON_ACTIVATE.forEach(name=>{
+    insertTreatmentSorted(w, { id:newId(), base:name, status:'before', extra:{} });
+  });
+  return w;
+}
+
+function insertTreatmentSorted(bed, treatmentObj){
+  const orderIdx = TREATMENT_ORDER.indexOf(treatmentObj.base);
+  let insertAt = bed.treatments.length;
+  for(let i=0;i<bed.treatments.length;i++){
+    const t = bed.treatments[i];
+    if(t.status !== 'before') continue;
+    if(TREATMENT_ORDER.indexOf(t.base) > orderIdx){ insertAt = i; break; }
+  }
+  bed.treatments.splice(insertAt, 0, treatmentObj);
+}
+
+let boardBusy = false;
+let dragState = null;
+
+async function loadState(){
+  if(boardBusy) return; // 입력/드래그 중에는 새로고침으로 화면이 바뀌지 않도록 건너뜀
+  try{
+    const { data, error } = await sb
+      .from('board_state')
+      .select('data')
+      .eq('id', ROW_ID)
+      .single();
+    if(error) throw error;
+    if(data && data.data){
+      const payload = data.data;
+      const parsed = Array.isArray(payload) ? payload : payload.beds;
+      if(Array.isArray(parsed) && parsed.length === BED_COUNT){
+        parsed.forEach(b=>{ if(b.region === undefined) b.region = ''; });
+        state = parsed;
+      }
+      if(payload && Array.isArray(payload.waiting)) waitingList = payload.waiting;
+    }
+    document.getElementById('syncNote').textContent = new Date().toLocaleTimeString('ko-KR');
+  }catch(e){
+    document.getElementById('syncNote').textContent = '연결 실패';
+  }
+  renderAll();
+}
+
+async function saveState(){
+  try{
+    const { error } = await sb
+      .from('board_state')
+      .upsert({ id: ROW_ID, data: { beds: state, waiting: waitingList }, updated_at: new Date().toISOString() });
+    if(error) throw error;
+    document.getElementById('syncNote').textContent = new Date().toLocaleTimeString('ko-KR');
+  }catch(e){
+    document.getElementById('syncNote').textContent = '저장 실패';
+  }
+}
+
+// 다른 기기에서 저장하면 실시간으로 이 화면도 자동 반영
+sb
+  .channel('board_state_changes')
+  .on('postgres_changes', { event:'*', schema:'public', table:'board_state', filter:`id=eq.${ROW_ID}` }, ()=>{
+    loadState();
+  })
+  .subscribe();
+
+function toggleActivate(bed){
+  bed.active = !bed.active;
+  if(bed.active && bed.treatments.length === 0){
+    DEFAULT_ON_ACTIVATE.forEach(name=>{
+      insertTreatmentSorted(bed, { id:newId(), base:name, status:'before', extra:{} });
+    });
+  }
+  saveState(); renderAll();
+}
+
+function resetBed(bedId){
+  const idx = state.findIndex(b=>b.id===bedId);
+  state[idx] = emptyBed(bedId);
+  saveState(); renderAll();
+}
+
+function assignWaitingToBed(waitingId, bedId){
+  const wIdx = waitingList.findIndex(w=>w.id===waitingId);
+  if(wIdx === -1) return;
+  const w = waitingList.splice(wIdx, 1)[0];
+  const bed = state.find(b=>b.id===bedId);
+  bed.active = true;
+  bed.patient = w.patient;
+  bed.region = w.region;
+  bed.doctor = w.doctor;
+  bed.treatments = w.treatments;
+  saveState(); renderAll();
+}
+
+function renderAll(){
+  render();
+  renderWaiting();
+}
+
+function renderWaiting(){
+  const box = document.getElementById('waitingBoard');
+  box.innerHTML = '';
+  waitingList.forEach(w=>{
+    const row = document.createElement('div');
+    row.className = 'waiting-row';
+
+    const handle = document.createElement('div');
+    handle.className = 'waiting-handle';
+    handle.textContent = '⠿';
+    handle.style.touchAction = 'none';
+    handle.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      dragState = { type:'waiting', id:w.id };
+      row.classList.add('dragging');
+      showDragGhost(w.patient || '대기 환자', e.clientX, e.clientY);
+    });
+    row.appendChild(handle);
+
+    const nameInput = document.createElement('input');
+    nameInput.className = 'patient-input';
+    nameInput.placeholder = '환자명';
+    nameInput.value = w.patient;
+    nameInput.addEventListener('change', e=>{ w.patient = e.target.value; saveState(); });
+    const nameCell = document.createElement('div');
+    nameCell.className = 'patient-cell';
+    nameCell.appendChild(nameInput);
+    row.appendChild(nameCell);
+
+    const regionInput = document.createElement('input');
+    regionInput.className = 'region-input';
+    regionInput.placeholder = '부위';
+    regionInput.value = w.region;
+    regionInput.addEventListener('change', e=>{ w.region = e.target.value; saveState(); });
+    const regionCell = document.createElement('div');
+    regionCell.className = 'region-cell';
+    regionCell.appendChild(regionInput);
+    row.appendChild(regionCell);
+
+    const doctorCell = document.createElement('div');
+    doctorCell.className = 'doctor-cell';
+    const doctorGroup = document.createElement('div');
+    doctorGroup.className = 'doctor-group';
+    DOCTORS.forEach(d=>{
+      const dBtn = document.createElement('button');
+      dBtn.className = 'btn-doctor' + (w.doctor===d.id ? ' sel' : '');
+      dBtn.style.setProperty('--dcolor', d.color);
+      dBtn.textContent = d.id;
+      dBtn.addEventListener('click', ()=>{
+        w.doctor = (w.doctor === d.id) ? null : d.id;
+        saveState(); renderAll();
+      });
+      doctorGroup.appendChild(dBtn);
+    });
+    doctorCell.appendChild(doctorGroup);
+    row.appendChild(doctorCell);
+
+    const treatZone = document.createElement('div');
+    treatZone.className = 'waiting-treat-zone';
+    const addedNames = new Set(w.treatments.map(t=>t.base));
+
+    const chipRow = document.createElement('div');
+    chipRow.className = 'chip-row';
+    w.treatments.forEach(t=> chipRow.appendChild(makeWaitingChip(w, t)));
+    if(chipRow.children.length) treatZone.appendChild(chipRow);
+
+    const btnRow = document.createElement('div');
+    btnRow.className = 'chip-row';
+    TREATMENT_ORDER.forEach(name=>{
+      if(!addedNames.has(name)){
+        const btn = document.createElement('button');
+        btn.className = 'btn-quick';
+        btn.style.setProperty('--tcolor', TREATMENT_COLORS[name]);
+        btn.textContent = name;
+        btn.addEventListener('click', ()=>{
+          w.treatments.push({ id:newId(), base:name, status:'before', extra:{} });
+          saveState(); renderAll();
+        });
+        btnRow.appendChild(btn);
+      }
+    });
+    if(btnRow.children.length) treatZone.appendChild(btnRow);
+    row.appendChild(treatZone);
+
+    const actionsCell = document.createElement('div');
+    actionsCell.className = 'waiting-actions';
+
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'btn-copy';
+    copyBtn.textContent = '복사';
+    copyBtn.addEventListener('click', ()=> copyWaitingSummary(w, copyBtn));
+    actionsCell.appendChild(copyBtn);
+
+    const delBtn = document.createElement('button');
+    delBtn.className = 'btn-reset';
+    delBtn.textContent = '삭제';
+    delBtn.addEventListener('click', ()=>{
+      waitingList = waitingList.filter(x=>x.id!==w.id);
+      saveState(); renderAll();
+    });
+    actionsCell.appendChild(delBtn);
+
+    row.appendChild(actionsCell);
+
+    box.appendChild(row);
+  });
+}
+
+function makeWaitingChip(w, treatment){
+  const fields = FORM_CONFIG[treatment.base];
+  const tcolor = TREATMENT_COLORS[treatment.base] || '#7A1F3D';
+  const chip = document.createElement('div');
+  chip.dataset.id = treatment.id;
+  chip.dataset.waitingId = w.id;
+  chip.style.touchAction = 'none';
+  chip.addEventListener('pointerdown', e=>{
+    if(e.target.tagName === 'INPUT' || e.target.closest('.del')) return;
+    e.preventDefault();
+    const startX = e.clientX, startY = e.clientY;
+    let started = false;
+    const onMove = ev=>{
+      if(!started && (Math.abs(ev.clientX-startX)>6 || Math.abs(ev.clientY-startY)>6)){
+        started = true;
+        dragState = { type:'waitingTreat', treatId: treatment.id, waitingId: w.id };
+        chip.classList.add('dragging');
+      }
+    };
+    const onUp = ()=>{
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+
+  if(fields){
+    chip.className = 'chip-split';
+    chip.style.setProperty('--tcolor', tcolor);
+    const label = document.createElement('div');
+    label.className = 'chip-label';
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+    fields.forEach(f=>{
+      const inp = document.createElement('input');
+      inp.placeholder = f;
+      inp.value = treatment.extra[f] || '';
+      autoGrowInput(inp);
+      inp.addEventListener('input', e=>{ treatment.extra[f] = e.target.value; autoGrowInput(inp); });
+      inp.addEventListener('change', ()=> saveState());
+      chip.appendChild(inp);
+    });
+    const del = document.createElement('div');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('click', ()=>{
+      w.treatments = w.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
+  }else{
+    chip.className = 'chip';
+    chip.style.setProperty('--tcolor', tcolor);
+    const label = document.createElement('span');
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+    const del = document.createElement('span');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('click', ()=>{
+      w.treatments = w.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
+  }
+  return chip;
+}
+
+document.getElementById('addWaitingBtn').addEventListener('click', ()=>{
+  waitingList.push(emptyWaitingPatient());
+  saveState(); renderAll();
+});
+
+function render(){
+  const board = document.getElementById('board');
+  board.innerHTML = '';
+  state.forEach(bed=>{
+    const row = document.createElement('div');
+
+    if(!bed.active){
+      row.className = 'bed-row inactive';
+      row.dataset.bed = bed.id;
+      row.addEventListener('click', ()=> toggleActivate(bed));
+
+      const numCell = document.createElement('div');
+      numCell.className = 'bed-num';
+      const badge = document.createElement('div');
+      badge.className = 'bed-num-badge';
+      badge.dataset.bed = bed.id;
+      badge.textContent = bed.id;
+      numCell.appendChild(badge);
+      row.appendChild(numCell);
+
+      const label = document.createElement('div');
+      label.className = 'inactive-label';
+      label.textContent = '비활성 · 클릭하여 시작';
+      row.appendChild(label);
+
+      board.appendChild(row);
+      return;
+    }
+
+    row.className = 'bed-row';
+    row.dataset.bed = bed.id;
+
+    // 베드 번호: 짧게 탭 = 활성화 토글, 끌면(드래그) = 다른 베드로 환자 이동
+    const numCell = document.createElement('div');
+    numCell.className = 'bed-num';
+    const badge = document.createElement('div');
+    badge.className = 'bed-num-badge on';
+    badge.dataset.bed = bed.id;
+    badge.textContent = bed.id;
+    badge.style.touchAction = 'none';
+    badge.addEventListener('pointerdown', e=>{
+      e.preventDefault();
+      const startX = e.clientX, startY = e.clientY;
+      let started = false;
+      const onMove = ev=>{
+        if(!started && (Math.abs(ev.clientX-startX)>6 || Math.abs(ev.clientY-startY)>6)){
+          started = true;
+          dragState = { type:'bedMove', bedId: bed.id };
+          showDragGhost(bed.patient || ('베드 ' + bed.id), ev.clientX, ev.clientY);
+        }
+        if(started) moveDragGhost(ev.clientX, ev.clientY);
+      };
+      const onUp = ev=>{
+        document.removeEventListener('pointermove', onMove);
+        document.removeEventListener('pointerup', onUp);
+        if(!started) toggleActivate(bed); // 움직이지 않았으면 그냥 클릭으로 처리
+      };
+      document.addEventListener('pointermove', onMove);
+      document.addEventListener('pointerup', onUp);
+    });
+    numCell.appendChild(badge);
+    row.appendChild(numCell);
+
+    // 환자명
+    const patientCell = document.createElement('div');
+    patientCell.className = 'patient-cell';
+    const patientInput = document.createElement('input');
+    patientInput.className = 'patient-input';
+    patientInput.placeholder = '환자명';
+    patientInput.value = bed.patient;
+    patientInput.addEventListener('change', e=>{ bed.patient = e.target.value; saveState(); });
+    patientCell.appendChild(patientInput);
+    row.appendChild(patientCell);
+
+    // 부위
+    const regionCell = document.createElement('div');
+    regionCell.className = 'region-cell';
+    const regionInput = document.createElement('input');
+    regionInput.className = 'region-input';
+    regionInput.placeholder = '부위';
+    regionInput.value = bed.region || '';
+    regionInput.addEventListener('change', e=>{ bed.region = e.target.value; saveState(); });
+    regionCell.appendChild(regionInput);
+    row.appendChild(regionCell);
+
+    // 담당 K/J/C
+    const doctorCell = document.createElement('div');
+    doctorCell.className = 'doctor-cell';
+    const doctorGroup = document.createElement('div');
+    doctorGroup.className = 'doctor-group';
+    DOCTORS.forEach(d=>{
+      const dBtn = document.createElement('button');
+      dBtn.className = 'btn-doctor' + (bed.doctor===d.id ? ' sel' : '');
+      dBtn.style.setProperty('--dcolor', d.color);
+      dBtn.textContent = d.id;
+      dBtn.addEventListener('click', ()=>{
+        bed.doctor = (bed.doctor === d.id) ? null : d.id;
+        saveState(); renderAll();
+      });
+      doctorGroup.appendChild(dBtn);
+    });
+    doctorCell.appendChild(doctorGroup);
+    row.appendChild(doctorCell);
+
+    // 치료 전 / 치료 중 / 치료 완료
+    ['before','during','done'].forEach(status=>{
+      const zone = document.createElement('div');
+      zone.className = 'zone';
+      zone.dataset.status = status;
+      zone.dataset.bed = bed.id;
+
+
+      if(status === 'before'){
+        const beforeItems = bed.treatments.filter(t=>t.status==='before');
+        const addedNames = new Set(beforeItems.map(t=>t.base));
+
+        // 윗줄: 이미 선택된 치료(칩) — 실제 저장된 순서 그대로 (드래그로 바꾼 순서 유지)
+        const chipRow = document.createElement('div');
+        chipRow.className = 'chip-row';
+        beforeItems.forEach(t=> chipRow.appendChild(makeChip(bed, t)));
+        if(chipRow.children.length) zone.appendChild(chipRow);
+
+        // 아랫줄: 아직 선택 안 된 치료(버튼)
+        const btnRow = document.createElement('div');
+        btnRow.className = 'chip-row';
+        TREATMENT_ORDER.forEach(name=>{
+          if(!addedNames.has(name)){
+            const btn = document.createElement('button');
+            btn.className = 'btn-quick';
+            btn.style.setProperty('--tcolor', TREATMENT_COLORS[name]);
+            btn.textContent = name;
+            btn.addEventListener('click', ()=>{
+              insertTreatmentSorted(bed, { id:newId(), base:name, status:'before', extra:{} });
+              saveState(); renderAll();
+            });
+            btnRow.appendChild(btn);
+          }
+        });
+        if(btnRow.children.length) zone.appendChild(btnRow);
+      }else{
+        const chipRow = document.createElement('div');
+        chipRow.className = 'chip-row';
+        bed.treatments.filter(t=>t.status===status).forEach(t=>{
+          chipRow.appendChild(makeChip(bed, t));
+        });
+        zone.appendChild(chipRow);
+      }
+
+      row.appendChild(zone);
+    });
+
+    // 초기화
+    const resetCell = document.createElement('div');
+    resetCell.className = 'reset-cell';
+    const resetBtn = document.createElement('button');
+    resetBtn.className = 'btn-reset';
+    resetBtn.textContent = '초기화';
+    resetBtn.addEventListener('click', ()=> resetBed(bed.id));
+    resetCell.appendChild(resetBtn);
+    row.appendChild(resetCell);
+
+    board.appendChild(row);
+  });
+}
+
+function makeChip(bed, treatment){
+  const fields = FORM_CONFIG[treatment.base];
+  const tcolor = TREATMENT_COLORS[treatment.base] || '#7A1F3D';
+
+  const chip = document.createElement('div');
+  chip.dataset.status = treatment.status;
+  chip.dataset.bed = bed.id;
+  chip.dataset.id = treatment.id;
+  chip.style.touchAction = 'none';
+  chip.addEventListener('pointerdown', e=>{
+    if(e.target.tagName === 'INPUT' || e.target.closest('.del')) return;
+    e.preventDefault();
+    const startX = e.clientX, startY = e.clientY;
+    let started = false;
+    const onMove = ev=>{
+      if(!started && (Math.abs(ev.clientX-startX)>6 || Math.abs(ev.clientY-startY)>6)){
+        started = true;
+        dragState = { type:'treatment', treatId: treatment.id };
+        chip.classList.add('dragging');
+      }
+    };
+    const onUp = ()=>{
+      document.removeEventListener('pointermove', onMove);
+      document.removeEventListener('pointerup', onUp);
+    };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+  });
+
+  if(fields){
+    chip.className = 'chip-split';
+    chip.style.setProperty('--tcolor', tcolor);
+
+    const label = document.createElement('div');
+    label.className = 'chip-label';
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+
+    fields.forEach(f=>{
+      const inp = document.createElement('input');
+      inp.placeholder = f;
+      inp.value = treatment.extra[f] || '';
+      autoGrowInput(inp);
+      inp.addEventListener('input', e=>{ treatment.extra[f] = e.target.value; autoGrowInput(inp); });
+      inp.addEventListener('change', ()=> saveState());
+      chip.appendChild(inp);
+    });
+
+    const del = document.createElement('div');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('pointerdown', e=> e.stopPropagation());
+    del.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      bed.treatments = bed.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
+  }else{
+    chip.className = 'chip';
+    chip.style.setProperty('--tcolor', tcolor);
+
+    const label = document.createElement('span');
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+
+    const del = document.createElement('span');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('pointerdown', e=> e.stopPropagation());
+    del.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      bed.treatments = bed.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
+  }
+
+  return chip;
+}
+
+function findAndRemoveTreatment(treatId){
+  for(const b of state){
+    const idx = b.treatments.findIndex(t=>t.id===treatId);
+    if(idx>-1) return b.treatments.splice(idx,1)[0];
+  }
+  return null;
+}
+
+function moveTreatmentToZone(treatId, targetBedId, targetStatus){
+  const obj = findAndRemoveTreatment(treatId);
+  if(!obj) return;
+  obj.status = targetStatus;
+  const targetBed = state.find(b=>b.id===targetBedId);
+  targetBed.treatments.push(obj);
+  saveState(); renderAll();
+}
+
+function reorderTreatment(draggedId, targetBedId, targetTreatId, insertBefore, targetStatus){
+  const obj = findAndRemoveTreatment(draggedId);
+  if(!obj) return;
+  obj.status = targetStatus;
+  const targetBed = state.find(b=>b.id===targetBedId);
+  const targetIdx = targetBed.treatments.findIndex(t=>t.id===targetTreatId);
+  const insertAt = insertBefore ? targetIdx : targetIdx+1;
+  targetBed.treatments.splice(Math.max(0,insertAt), 0, obj);
+  saveState(); renderAll();
+}
+
+renderAll(); // 서버 응답 기다리지 않고 일단 기본 화면부터 표시
+loadState(); // 이후 실제 저장된 데이터로 갱신
+
+const boardEl = document.getElementById('board');
+boardEl.addEventListener('focusin', ()=>{ boardBusy = true; });
+boardEl.addEventListener('focusout', ()=>{ boardBusy = false; });
+boardEl.addEventListener('dragstart', ()=>{ boardBusy = true; });
+boardEl.addEventListener('dragend', ()=>{ boardBusy = false; });
+boardEl.addEventListener('mousedown', ()=>{
+  boardBusy = true;
+  clearTimeout(window.__busyTimer);
+  window.__busyTimer = setTimeout(()=>{ boardBusy = false; }, 400);
+});
+
+// 드래그 중 손가락/커서를 따라다니는 안내 라벨
+let ghostEl = null;
+function showDragGhost(text, x, y){
+  removeDragGhost();
+  ghostEl = document.createElement('div');
+  ghostEl.className = 'drag-ghost';
+  ghostEl.textContent = text;
+  document.body.appendChild(ghostEl);
+  moveDragGhost(x, y);
+}
+function moveDragGhost(x, y){
+  if(ghostEl){ ghostEl.style.left = x + 'px'; ghostEl.style.top = y + 'px'; }
+}
+function removeDragGhost(){
+  if(ghostEl){ ghostEl.remove(); ghostEl = null; }
+}
+
+function clearDropHighlights(){
+  document.querySelectorAll('.zone.drag-over').forEach(z=>z.classList.remove('drag-over'));
+  document.querySelectorAll('.bed-row.drop-target').forEach(r=>r.classList.remove('drop-target'));
+}
+
+function buildTreatmentSummary(treatments){
+  const yakIdx = treatments.findIndex(t=>t.base==='약침');
+  const chimIdx = treatments.findIndex(t=>t.base==='침(전)');
+  const out = [];
+  for(let i=0;i<treatments.length;i++){
+    if(i===yakIdx && chimIdx>-1) continue; // 침(전)에 합쳐서 표시
+    const t = treatments[i];
+    if(i===chimIdx && yakIdx>-1){
+      const yak = treatments[yakIdx];
+      const kind = yak.extra['종류'] || '';
+      const cc = yak.extra['cc'] || '';
+      const count = yak.extra['개수'] || '';
+      let detail = kind;
+      if(cc || count) detail += `(${cc}cc*${count})`;
+      out.push('침(전)+' + detail);
+      continue;
+    }
+    const fields = FORM_CONFIG[t.base];
+    if(fields){
+      const vals = fields.map(f=> t.extra[f]).filter(v=>v);
+      out.push(t.base + (vals.length ? '(' + vals.join('/') + ')' : ''));
+    }else{
+      out.push(t.base);
+    }
+  }
+  return out.map((s,i)=> (i+1) + s).join(' ');
+}
+
+function showToast(text){
+  let toast = document.getElementById('toast');
+  if(!toast){
+    toast = document.createElement('div');
+    toast.id = 'toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = text;
+  toast.classList.add('show');
+  clearTimeout(window.__toastTimer);
+  window.__toastTimer = setTimeout(()=> toast.classList.remove('show'), 1800);
+}
+
+async function copyWaitingSummary(w, btn){
+  const summary = buildTreatmentSummary(w.treatments);
+  const text = (w.patient ? w.patient + ' ' : '') + summary;
+
+  let copied = false;
+  try{
+    if(navigator.clipboard && window.isSecureContext){
+      await navigator.clipboard.writeText(text);
+      copied = true;
+    }
+  }catch(e){ copied = false; }
+
+  if(!copied){
+    // 클립보드 API를 못 쓰는 환경 대비: 숨긴 textarea로 대체 복사
+    try{
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.focus();
+      ta.select();
+      copied = document.execCommand('copy');
+      ta.remove();
+    }catch(e){ copied = false; }
+  }
+
+  if(copied){
+    showToast('복사되었습니다');
+  }else{
+    showToast('복사 실패 - 아래 텍스트를 직접 복사하세요');
+    alert(text);
+  }
+}
+
+function reorderWaitingTreatment(waitingId, draggedId, targetId, insertBefore){
+  const w = waitingList.find(x=>x.id===waitingId);
+  if(!w) return;
+  const idx = w.treatments.findIndex(t=>t.id===draggedId);
+  if(idx===-1) return;
+  const obj = w.treatments.splice(idx,1)[0];
+  const targetIdx = w.treatments.findIndex(t=>t.id===targetId);
+  const insertAt = insertBefore ? targetIdx : targetIdx+1;
+  w.treatments.splice(Math.max(0,insertAt), 0, obj);
+  saveState(); renderAll();
+}
+
+function moveBedToBed(sourceBedId, targetBedId){
+  if(sourceBedId === targetBedId) return;
+  const source = state.find(b=>b.id===sourceBedId);
+  const target = state.find(b=>b.id===targetBedId);
+  const copy = { patient:source.patient, region:source.region, doctor:source.doctor, treatments:source.treatments };
+  target.active = true;
+  target.patient = copy.patient;
+  target.region = copy.region;
+  target.doctor = copy.doctor;
+  target.treatments = copy.treatments;
+  const idx = state.findIndex(b=>b.id===sourceBedId);
+  state[idx] = emptyBed(sourceBedId);
+  saveState(); renderAll();
+}
+
+document.addEventListener('pointermove', e=>{
+  if(!dragState) return;
+  moveDragGhost(e.clientX, e.clientY);
+  clearDropHighlights();
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+
+  if(dragState.type === 'waiting' || dragState.type === 'bedMove'){
+    const rowEl = el && el.closest('.bed-row');
+    if(rowEl && !(dragState.type==='bedMove' && parseInt(rowEl.dataset.bed)===dragState.bedId)){
+      rowEl.classList.add('drop-target');
+    }
+    return;
+  }
+  const zoneEl = el && el.closest('.zone');
+  if(zoneEl) zoneEl.classList.add('drag-over');
+});
+
+function endDrag(e){
+  if(!dragState) return;
+  const drag = dragState;
+  dragState = null;
+  boardBusy = false;
+  removeDragGhost();
+  document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
+  clearDropHighlights();
+
+  const el = document.elementFromPoint(e.clientX, e.clientY);
+  if(!el) return;
+
+  if(drag.type === 'waiting'){
+    const rowEl = el.closest('.bed-row');
+    if(rowEl) assignWaitingToBed(drag.id, parseInt(rowEl.dataset.bed));
+    return;
+  }
+  if(drag.type === 'bedMove'){
+    const rowEl = el.closest('.bed-row');
+    if(rowEl) moveBedToBed(drag.bedId, parseInt(rowEl.dataset.bed));
+    return;
+  }
+  if(drag.type === 'waitingTreat'){
+    const chipEl = el.closest('[data-id]');
+    if(chipEl && chipEl.dataset.waitingId && chipEl.dataset.id !== drag.treatId){
+      const rect = chipEl.getBoundingClientRect();
+      const insertBefore = (e.clientX - rect.left) < rect.width/2;
+      reorderWaitingTreatment(drag.waitingId, drag.treatId, chipEl.dataset.id, insertBefore);
+    }
+    return;
+  }
+
+  const treatId = drag.treatId;
+  const chipEl = el.closest('[data-id]');
+  const zoneEl = el.closest('.zone');
+  if(chipEl && chipEl.dataset.id && chipEl.dataset.id !== treatId){
+    const targetBedId = parseInt(chipEl.dataset.bed);
+    const rect = chipEl.getBoundingClientRect();
+    const insertBefore = (e.clientX - rect.left) < rect.width/2;
+    reorderTreatment(treatId, targetBedId, chipEl.dataset.id, insertBefore, chipEl.dataset.status);
+  }else if(zoneEl){
+    moveTreatmentToZone(treatId, parseInt(zoneEl.dataset.bed), zoneEl.dataset.status);
+  }
+}
+document.addEventListener('pointerup', endDrag);
+document.addEventListener('pointercancel', ()=>{
+  dragState = null;
+  boardBusy = false;
+  removeDragGhost();
+  document.querySelectorAll('.dragging').forEach(c=>c.classList.remove('dragging'));
+  clearDropHighlights();
+});
+
+</script>
+
+</body>
+</html>

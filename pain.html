@@ -684,7 +684,7 @@ function renderWaiting(){
 
     const readyBtn = document.createElement('button');
     readyBtn.className = 'btn-ready' + (w.ready ? ' on' : '');
-    readyBtn.textContent = w.ready ? '완료 ✓' : '완료';
+    readyBtn.textContent = '완료';
     readyBtn.addEventListener('click', ()=>{
       w.ready = !w.ready;
       saveState(); renderAll();

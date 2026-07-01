@@ -337,6 +337,24 @@
   }
   .btn-copy:hover{ background:var(--burgundy-deep); color:#fff; }
 
+  .btn-ready{
+    border:1.5px solid #8AA624;
+    background:transparent;
+    color:#8AA624;
+    border-radius:8px;
+    font-size:12px;
+    font-weight:700;
+    padding:7px 6px;
+    cursor:pointer;
+  }
+  .btn-ready.on{ background:#8AA624; color:#fff; }
+
+  .waiting-row.ready{
+    border-style:solid;
+    border-color:#8AA624;
+    background:#F5F8EA;
+  }
+
   #toast{
     position:fixed;
     left:50%;
@@ -477,7 +495,7 @@ function autoGrowInput(inp){
   inp.style.width = Math.max(38, textWidth + 22) + 'px';
 }
 function emptyWaitingPatient(){
-  const w = { id:newId(), patient:'', region:'', doctor:null, treatments:[] };
+  const w = { id:newId(), patient:'', region:'', doctor:null, treatments:[], ready:false };
   DEFAULT_ON_ACTIVATE.forEach(name=>{
     insertTreatmentSorted(w, { id:newId(), base:name, status:'before', extra:{} });
   });
@@ -582,7 +600,7 @@ function renderWaiting(){
   box.innerHTML = '';
   waitingList.forEach(w=>{
     const row = document.createElement('div');
-    row.className = 'waiting-row';
+    row.className = 'waiting-row' + (w.ready ? ' ready' : '');
 
     const handle = document.createElement('div');
     handle.className = 'waiting-handle';
@@ -663,6 +681,15 @@ function renderWaiting(){
 
     const actionsCell = document.createElement('div');
     actionsCell.className = 'waiting-actions';
+
+    const readyBtn = document.createElement('button');
+    readyBtn.className = 'btn-ready' + (w.ready ? ' on' : '');
+    readyBtn.textContent = w.ready ? '완료 ✓' : '완료';
+    readyBtn.addEventListener('click', ()=>{
+      w.ready = !w.ready;
+      saveState(); renderAll();
+    });
+    actionsCell.appendChild(readyBtn);
 
     const copyBtn = document.createElement('button');
     copyBtn.className = 'btn-copy';

@@ -468,19 +468,19 @@ const DOCTORS = [
   { id:'C', color:'var(--doc-c)' },
 ];
 
-const TREATMENT_ORDER = ['JB','돔','핫팩','I','약침','침','침(전)','건부','습부1','습부2','추나','추나(환자복)','충격파'];
+const TREATMENT_ORDER = ['JB','돔','핫팩','I','약침','침','침(전)','건부','습부1','습부2','추나','추나(환자복)','충격파','BC'];
 const TREATMENT_COLORS = {
   'JB':'#8E6C88', '돔':'#5C6B8A', '핫팩':'#C1652F', 'I':'#4C7A96', '약침':'#7A1F3D',
   '침':'#2F6B5E', '침(전)':'#2F6B5E',
   '건부':'#8AA624', '습부1':'#8AA624', '습부2':'#8AA624',
-  '추나':'#B08060', '추나(환자복)':'#B08060', '충격파':'#4A0F25'
+  '추나':'#B08060', '추나(환자복)':'#B08060', '충격파':'#4A0F25', 'BC':'#5C6B73'
 };
 const FORM_CONFIG = {
   '핫팩': ['부위'],
   'I': ['부위'],
   '약침': ['종류','cc','개수']
 };
-const DEFAULT_ON_ACTIVATE = ['핫팩','I','침(전)','습부2'];
+const DEFAULT_ON_ACTIVATE = ['핫팩','I','침(전)','습부2','BC'];
 const CHIM_BASES = ['침','침(전)'];
 const CHIM_POSITIONS = ['앞침','엎침','옆침/좌','옆침/우'];
 function treatmentLabel(t){
@@ -1177,7 +1177,7 @@ function clearDropHighlights(){
   document.querySelectorAll('.bed-row.drop-target').forEach(r=>r.classList.remove('drop-target'));
 }
 
-function buildTreatmentSummary(treatments){
+function buildTreatmentSummary(treatments, region){
   const yakIdx = treatments.findIndex(t=>t.base==='약침');
   const chimIdx = treatments.findIndex(t=>t.base==='침(전)');
   const out = [];
@@ -1192,6 +1192,16 @@ function buildTreatmentSummary(treatments){
       let detail = kind;
       if(cc || count) detail += `(${cc}cc*${count})`;
       out.push(treatmentLabel(t) + '+' + detail);
+      continue;
+    }
+    if(t.base === 'I'){
+      const val = (t.extra['부위'] && t.extra['부위'].trim()) ? t.extra['부위'] : (region || '');
+      out.push('I' + (val ? '(' + val + ')' : ''));
+      continue;
+    }
+    if(t.base === '핫팩'){
+      const val = t.extra['부위'] || '';
+      out.push('HP' + (val ? '(' + val + ')' : ''));
       continue;
     }
     const fields = FORM_CONFIG[t.base];
@@ -1219,7 +1229,7 @@ function showToast(text){
 }
 
 async function copyWaitingSummary(w, btn){
-  const summary = buildTreatmentSummary(w.treatments);
+  const summary = buildTreatmentSummary(w.treatments, w.region);
   const text = (w.patient ? w.patient + ' ' : '') + summary;
 
   let copied = false;

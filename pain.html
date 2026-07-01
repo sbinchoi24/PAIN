@@ -1035,6 +1035,7 @@ function reorderTreatment(draggedId, targetBedId, targetTreatId, insertBefore, t
 
 renderAll(); // 서버 응답 기다리지 않고 일단 기본 화면부터 표시
 loadState(); // 이후 실제 저장된 데이터로 갱신
+setInterval(loadState, 10000); // 실시간이 끊겨도 10초마다 안전망으로 재확인
 
 const boardEl = document.getElementById('board');
 boardEl.addEventListener('focusin', ()=>{ boardBusy = true; });

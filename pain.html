@@ -248,6 +248,16 @@
   }
   .chip-split input:focus{ outline:none; background:#FFF6EC; }
   .chip-split input + input{ border-left:1px solid #EFE3D6; }
+  .chim-position-select{
+    border:none;
+    background:#fff;
+    font-size:13px;
+    font-weight:600;
+    padding:0 6px;
+    color:var(--text-main);
+    cursor:pointer;
+    border-left:1px solid #EFE3D6;
+  }
   .chip-split .del{
     background:#fff;
     display:flex;
@@ -471,6 +481,35 @@ const FORM_CONFIG = {
   '약침': ['종류','cc','개수']
 };
 const DEFAULT_ON_ACTIVATE = ['핫팩','I','침(전)','습부2'];
+const CHIM_BASES = ['침','침(전)'];
+const CHIM_POSITIONS = ['앞침','엎침','옆침/좌','옆침/우'];
+function treatmentLabel(t){
+  if(CHIM_BASES.includes(t.base) && t.extra && t.extra['자세']){
+    return t.extra['자세'] + (t.base === '침(전)' ? '(전)' : '');
+  }
+  return t.base;
+}
+function buildPositionSelect(treatment, onChange){
+  const sel = document.createElement('select');
+  sel.className = 'chim-position-select';
+  const optDefault = document.createElement('option');
+  optDefault.value = '';
+  optDefault.textContent = '선택';
+  sel.appendChild(optDefault);
+  CHIM_POSITIONS.forEach(p=>{
+    const opt = document.createElement('option');
+    opt.value = p;
+    opt.textContent = p;
+    sel.appendChild(opt);
+  });
+  sel.value = (treatment.extra && treatment.extra['자세']) || '';
+  sel.addEventListener('pointerdown', e=> e.stopPropagation());
+  sel.addEventListener('change', e=>{
+    treatment.extra['자세'] = e.target.value;
+    onChange();
+  });
+  return sel;
+}
 
 function emptyBed(id){
   return { id, active:false, patient:'', region:'', doctor:null, treatments:[] };
@@ -763,6 +802,24 @@ function makeWaitingChip(w, treatment){
       saveState(); renderAll();
     });
     chip.appendChild(del);
+  }else if(CHIM_BASES.includes(treatment.base)){
+    chip.className = 'chip-split';
+    chip.style.setProperty('--tcolor', tcolor);
+    const label = document.createElement('div');
+    label.className = 'chip-label';
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+    if(!treatment.extra) treatment.extra = {};
+    const sel = buildPositionSelect(treatment, ()=>{ saveState(); renderAll(); });
+    chip.appendChild(sel);
+    const del = document.createElement('div');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('click', ()=>{
+      w.treatments = w.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
   }else{
     chip.className = 'chip';
     chip.style.setProperty('--tcolor', tcolor);
@@ -1009,6 +1066,29 @@ function makeChip(bed, treatment){
       saveState(); renderAll();
     });
     chip.appendChild(del);
+  }else if(CHIM_BASES.includes(treatment.base)){
+    chip.className = 'chip-split';
+    chip.style.setProperty('--tcolor', tcolor);
+
+    const label = document.createElement('div');
+    label.className = 'chip-label';
+    label.textContent = treatment.base;
+    chip.appendChild(label);
+
+    if(!treatment.extra) treatment.extra = {};
+    const sel = buildPositionSelect(treatment, ()=>{ saveState(); renderAll(); });
+    chip.appendChild(sel);
+
+    const del = document.createElement('div');
+    del.className = 'del';
+    del.textContent = '✕';
+    del.addEventListener('pointerdown', e=> e.stopPropagation());
+    del.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      bed.treatments = bed.treatments.filter(t=>t.id!==treatment.id);
+      saveState(); renderAll();
+    });
+    chip.appendChild(del);
   }else{
     chip.className = 'chip';
     chip.style.setProperty('--tcolor', tcolor);
@@ -1111,7 +1191,7 @@ function buildTreatmentSummary(treatments){
       const count = yak.extra['개수'] || '';
       let detail = kind;
       if(cc || count) detail += `(${cc}cc*${count})`;
-      out.push('침(전)+' + detail);
+      out.push(treatmentLabel(t) + '+' + detail);
       continue;
     }
     const fields = FORM_CONFIG[t.base];
@@ -1119,7 +1199,7 @@ function buildTreatmentSummary(treatments){
       const vals = fields.map(f=> t.extra[f]).filter(v=>v);
       out.push(t.base + (vals.length ? '(' + vals.join('/') + ')' : ''));
     }else{
-      out.push(t.base);
+      out.push(treatmentLabel(t));
     }
   }
   return out.map((s,i)=> (i+1) + s).join(' ');

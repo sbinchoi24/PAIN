@@ -1214,7 +1214,12 @@ function clearDropHighlights(){
   document.querySelectorAll('.bed-row.drop-target').forEach(r=>r.classList.remove('drop-target'));
 }
 
-function buildTreatmentSummary(treatments, region){
+const OUTPUT_ORDER = [...TREATMENT_ORDER].reverse();
+
+function buildTreatmentSummary(rawTreatments, region){
+  const treatments = rawTreatments.slice().sort((a,b)=>
+    OUTPUT_ORDER.indexOf(a.base) - OUTPUT_ORDER.indexOf(b.base)
+  );
   const yakIdx = treatments.findIndex(t=>t.base==='약침');
   const chimIdx = treatments.findIndex(t=>t.base==='침(전)');
   const out = [];

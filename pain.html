@@ -468,7 +468,7 @@ const DOCTORS = [
   { id:'C', color:'var(--doc-c)' },
 ];
 
-const TREATMENT_ORDER = ['JB','돔','핫팩','I','약침','침','침(전)','건부','습부1','습부2','간접구','추나','추나(환자복)','충격파','BC'];
+const TREATMENT_ORDER = ['충격파','추나','추나(환자복)','BC','간접구','습부2','습부1','건부','침(전)','침','약침','I','핫팩','돔','JB'];
 const TREATMENT_COLORS = {
   'JB':'#8E6C88', '돔':'#5C6B8A', '핫팩':'#C1652F', 'I':'#4C7A96', '약침':'#7A1F3D',
   '침':'#2F6B5E', '침(전)':'#2F6B5E',
@@ -480,7 +480,7 @@ const FORM_CONFIG = {
   'I': ['부위'],
   '약침': ['종류','cc','개수']
 };
-const DEFAULT_ON_ACTIVATE = ['핫팩','I','침(전)','습부2','BC'];
+const DEFAULT_ON_ACTIVATE = ['BC','습부2','침(전)','I','핫팩'];
 const CHIM_BASES = ['침','침(전)'];
 const CHIM_POSITIONS = ['앞침','엎침','옆침/좌','옆침/우'];
 function treatmentLabel(t){
@@ -709,7 +709,7 @@ function renderWaiting(){
         btn.style.setProperty('--tcolor', TREATMENT_COLORS[name]);
         btn.textContent = name;
         btn.addEventListener('click', ()=>{
-          w.treatments.push({ id:newId(), base:name, status:'before', extra:{} });
+          insertTreatmentSorted(w, { id:newId(), base:name, status:'before', extra:{} });
           saveState(); renderAll();
         });
         btnRow.appendChild(btn);

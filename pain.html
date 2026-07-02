@@ -183,17 +183,19 @@
   .btn-quick{
     flex:0 0 auto;
     height:42px;
-    border:1.5px solid var(--tcolor);
+    border:none;
     color:var(--tcolor);
-    background:#fff;
+    background:transparent;
     border-radius:16px;
     font-size:15px;
     font-weight:700;
     padding:0 16px;
     cursor:pointer;
     white-space:nowrap;
+    opacity:0.5;
+    transition:opacity .12s ease, background .12s ease, color .12s ease;
   }
-  .btn-quick:hover{ background:var(--tcolor); color:#fff; }
+  .btn-quick:hover{ opacity:1; background:var(--tcolor); color:#fff; }
 
   .chip{
     display:flex;
@@ -239,36 +241,37 @@
   }
   .chip-split input{
     border:none;
-    background:#fff;
+    background:var(--tcolor);
     font-size:14px;
     padding:0 7px;
     min-width:38px;
     width:52px;
-    color:var(--text-main);
+    color:#fff;
   }
-  .chip-split input:focus{ outline:none; background:#FFF6EC; }
-  .chip-split input + input{ border-left:1px solid #EFE3D6; }
+  .chip-split input::placeholder{ color:rgba(255,255,255,0.7); }
+  .chip-split input:focus{ outline:none; background:var(--tcolor); filter:brightness(1.12); }
+  .chip-split input + input{ border-left:1px solid rgba(255,255,255,0.25); }
   .chim-position-select{
     border:none;
-    background:#fff;
+    background:var(--tcolor);
     font-size:13px;
-    font-weight:600;
+    font-weight:400;
     padding:0 6px;
-    color:var(--text-main);
+    color:#fff;
     cursor:pointer;
-    border-left:1px solid #EFE3D6;
+    border-left:1px solid rgba(255,255,255,0.25);
   }
   .chip-split .del{
-    background:#fff;
+    background:var(--tcolor);
     display:flex;
     align-items:center;
     padding:0 13px;
     cursor:pointer;
-    color:var(--text-sub);
+    color:rgba(255,255,255,0.85);
     font-size:13px;
-    border-left:1px solid #EFE3D6;
+    border-left:1px solid rgba(255,255,255,0.25);
   }
-  .chip-split .del:hover{ color:var(--burgundy); }
+  .chip-split .del:hover{ color:#fff; }
 
   .reset-cell{ display:flex; align-items:center; }
   .btn-reset{

@@ -179,6 +179,13 @@
   .zone.drag-over{ border-color:var(--rose-dark); background:#FFF9F2; }
 
   .chip-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  .elapsed-tag{
+    font-size:12px;
+    font-weight:700;
+    color:var(--rose-dark);
+    white-space:nowrap;
+  }
+  .elapsed-tag.overdue{ color:#D6293E; }
 
   .btn-quick{
     flex:0 0 auto;
@@ -990,6 +997,14 @@ function render(){
         chipRow.className = 'chip-row';
         bed.treatments.filter(t=>t.status===status).forEach(t=>{
           chipRow.appendChild(makeChip(bed, t));
+          if(status === 'during' && t.startedAt){
+            const mins = Math.floor((Date.now() - t.startedAt) / 60000);
+            const tag = document.createElement('span');
+            tag.className = 'elapsed-tag' + (mins >= 8 ? ' overdue' : '');
+            tag.dataset.started = t.startedAt;
+            tag.textContent = elapsedText(t.startedAt);
+            chipRow.appendChild(tag);
+          }
         });
         zone.appendChild(chipRow);
       }
@@ -1123,10 +1138,24 @@ function findAndRemoveTreatment(treatId){
   return null;
 }
 
+function elapsedText(startedAt){
+  const mins = Math.floor((Date.now() - startedAt) / 60000);
+  return (mins < 1 ? 0 : mins) + '분 경과';
+}
+
+function applyStatusChange(obj, targetStatus){
+  if(targetStatus === 'during' && obj.status !== 'during'){
+    obj.startedAt = Date.now();
+  }else if(targetStatus !== 'during'){
+    delete obj.startedAt;
+  }
+  obj.status = targetStatus;
+}
+
 function moveTreatmentToZone(treatId, targetBedId, targetStatus){
   const obj = findAndRemoveTreatment(treatId);
   if(!obj) return;
-  obj.status = targetStatus;
+  applyStatusChange(obj, targetStatus);
   const targetBed = state.find(b=>b.id===targetBedId);
   targetBed.treatments.push(obj);
   saveState(); renderAll();
@@ -1135,7 +1164,7 @@ function moveTreatmentToZone(treatId, targetBedId, targetStatus){
 function reorderTreatment(draggedId, targetBedId, targetTreatId, insertBefore, targetStatus){
   const obj = findAndRemoveTreatment(draggedId);
   if(!obj) return;
-  obj.status = targetStatus;
+  applyStatusChange(obj, targetStatus);
   const targetBed = state.find(b=>b.id===targetBedId);
   const targetIdx = targetBed.treatments.findIndex(t=>t.id===targetTreatId);
   const insertAt = insertBefore ? targetIdx : targetIdx+1;

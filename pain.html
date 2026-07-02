@@ -182,10 +182,11 @@
   .elapsed-tag{
     font-size:12px;
     font-weight:700;
-    color:var(--rose-dark);
+    color:var(--tcolor);
     white-space:nowrap;
   }
   .elapsed-tag.overdue{ color:#D6293E; }
+  .zone-overdue{ background:#F9D8D8 !important; }
 
   .btn-quick{
     flex:0 0 auto;
@@ -995,17 +996,21 @@ function render(){
       }else{
         const chipRow = document.createElement('div');
         chipRow.className = 'chip-row';
+        let hasOverdue = false;
         bed.treatments.filter(t=>t.status===status).forEach(t=>{
           chipRow.appendChild(makeChip(bed, t));
           if(status === 'during' && t.startedAt){
             const mins = Math.floor((Date.now() - t.startedAt) / 60000);
+            if(mins >= 8) hasOverdue = true;
             const tag = document.createElement('span');
             tag.className = 'elapsed-tag' + (mins >= 8 ? ' overdue' : '');
+            tag.style.setProperty('--tcolor', TREATMENT_COLORS[t.base] || '#7A1F3D');
             tag.dataset.started = t.startedAt;
             tag.textContent = elapsedText(t.startedAt);
             chipRow.appendChild(tag);
           }
         });
+        if(status === 'during' && hasOverdue) zone.classList.add('zone-overdue');
         zone.appendChild(chipRow);
       }
 

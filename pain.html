@@ -534,7 +534,7 @@ function autoGrowInput(inp){
   ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
   const text = inp.value || inp.placeholder || '';
   const textWidth = ctx.measureText(text).width;
-  inp.style.width = Math.max(38, textWidth + 22) + 'px';
+  inp.style.width = Math.max(38, textWidth + 34) + 'px';
 }
 function emptyWaitingPatient(){
   const w = { id:newId(), patient:'', region:'', doctor:null, treatments:[], ready:false };

@@ -4,375 +4,441 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-<title>현황판</title>
+<link href="https://fonts.googleapis.com/css2?family=Pretendard:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<title>치료 현황판</title>
 <style>
   :root{
-    --burgundy-deep: #4A0F25;
-    --burgundy: #7A1F3D;
-    --rose-light: #F0D9C8;
-    --rose-mid: #C8A882;
-    --rose-dark: #B08060;
-    --ivory: #FAF6F0;
-    --ivory-card: #FFFDFB;
-    --text-main: #3A1420;
-    --text-sub: #8A6A5A;
-    --muted: #C9BEB4;
-    --doc-k: #7A1F3D;
-    --doc-j: #C1652F;
-    --doc-c: #2F6B5E;
-    --inactive-bg: #E9E1D6;
-    --inactive-border: #D3C3AF;
+    --primary: #0052FF;
+    --primary-light: #F0F4FF;
+    --primary-hover: #0041CC;
+    --doc-k: #5B5BFF;
+    --doc-j: #FF6B35;
+    --doc-c: #00C48C;
+    --success: #00C48C;
+    --warning: #FF6B35;
+    --bg: #FFFFFF;
+    --surface: #F8F9FB;
+    --border: #E5E8EF;
+    --text-primary: #1A1D29;
+    --text-secondary: #666C7F;
+    --text-tertiary: #989BA5;
+    --divider: #F0F1F5;
   }
   *{box-sizing:border-box;}
   html,body{ height:100%; }
   body{
     margin:0;
-    background:var(--ivory);
-    font-family:'Noto Sans KR', sans-serif;
-    color:var(--text-main);
-    padding:16px 20px;
-    font-size:16px;
+    background:var(--surface);
+    font-family:'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    color:var(--text-primary);
+    padding:24px 32px;
+    font-size:14px;
     display:flex;
     flex-direction:column;
+    line-height:1.6;
   }
   header{
     display:flex;
-    align-items:baseline;
+    align-items:center;
     justify-content:space-between;
-    margin-bottom:10px;
+    margin-bottom:28px;
+    padding-bottom:16px;
+    border-bottom:1px solid var(--divider);
   }
   h1{
-    font-family:'Noto Sans KR', sans-serif;
-    font-weight:800;
-    font-size:24px;
-    color:var(--burgundy-deep);
+    font-family:'Pretendard', sans-serif;
+    font-weight:700;
+    font-size:28px;
+    color:var(--text-primary);
     margin:0;
     letter-spacing:-0.02em;
   }
-  .sync-note{ font-size:13px; color:var(--text-sub); }
+  .sync-note{ 
+    font-size:12px; 
+    color:var(--text-tertiary);
+    font-weight:500;
+  }
 
   .col-headers{
     display:grid;
     grid-template-columns: 48px 130px 100px 108px 2.3fr 0.85fr 1.2fr 60px;
     gap:14px;
-    padding:0 12px 5px 12px;
+    padding:0 12px 10px 12px;
+    margin-bottom:8px;
   }
-  .col-headers > div{ font-size:13.5px; color:var(--text-sub); font-weight:700; text-align:center; }
-  .col-headers .big{ font-size:15px; font-weight:800; }
-  .col-headers .h-before{ color:var(--burgundy); }
-  .col-headers .h-during{ color:var(--rose-dark); }
-  .col-headers .h-done{ color:#8C7E71; }
+  .col-headers > div{ 
+    font-size:12px; 
+    color:var(--text-secondary); 
+    font-weight:600; 
+    text-align:center;
+    text-transform:uppercase;
+    letter-spacing:0.5px;
+  }
 
-  .board{ display:flex; flex-direction:column; gap:6px; }
+  .board{ display:flex; flex-direction:column; gap:8px; }
 
   /* 활성 베드 */
   .bed-row{
-    background:var(--ivory-card);
-    border:2px solid var(--rose-dark);
-    box-shadow:0 2px 8px rgba(74,15,37,0.06);
-    border-radius:12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    box-shadow:0 1px 3px rgba(0,0,0,0.04);
+    border-radius:8px;
     display:grid;
     grid-template-columns: 48px 130px 100px 108px 2.3fr 0.85fr 1.2fr 60px;
     gap:14px;
     align-items:stretch;
-    padding:8px 12px;
+    padding:12px;
+    transition:box-shadow 0.2s, border-color 0.2s;
+  }
+  .bed-row:hover{ 
+    box-shadow:0 2px 8px rgba(0,0,0,0.06);
   }
 
-  /* 비활성 베드: 얇은 바 하나로 접힘 */
+  /* 비활성 베드 */
   .bed-row.inactive{
-    background:var(--inactive-bg);
-    border:1.5px dashed var(--inactive-border);
+    background:var(--bg);
+    border:1px dashed var(--border);
     box-shadow:none;
     grid-template-columns: 48px 1fr;
-    padding:5px 12px;
     cursor:pointer;
   }
-  .bed-row.inactive:hover{ background:#E2D8C9; }
+  .bed-row.inactive:hover{ 
+    background:var(--primary-light);
+    border-color:var(--primary);
+  }
   .inactive-label{
     display:flex;
     align-items:center;
     font-size:14px;
-    font-weight:700;
-    color:var(--text-sub);
+    font-weight:500;
+    color:var(--text-secondary);
   }
 
   .bed-num{ display:flex; align-items:center; justify-content:center; }
   .bed-num-badge{
-    width:42px;height:42px;
-    border-radius:50%;
-    border:2.5px solid var(--rose-dark);
+    width:40px;height:40px;
+    border-radius:8px;
+    border:2px solid var(--border);
     display:flex;align-items:center;justify-content:center;
-    font-family:'Noto Sans KR', sans-serif;
-    font-weight:800;
-    font-size:17px;
-    color:var(--burgundy-deep);
-    background:var(--ivory);
+    font-weight:700;
+    font-size:15px;
+    color:var(--text-secondary);
+    background:var(--bg);
     cursor:pointer;
-    transition:transform .12s ease;
+    transition:all .15s ease;
     flex-shrink:0;
   }
-  .bed-num-badge:hover{ transform:scale(1.07); }
+  .bed-num-badge:hover{ 
+    border-color:var(--primary);
+    color:var(--primary);
+  }
   .bed-num-badge.on{
-    background:var(--burgundy-deep);
+    background:var(--primary);
     color:#fff;
-    border-color:var(--burgundy-deep);
+    border-color:var(--primary);
   }
 
   .patient-cell{ display:flex; align-items:center; justify-content:center; }
   .patient-input{
     border:none;
     background:transparent;
-    font-size:19px;
-    font-weight:800;
-    color:var(--text-main);
-    padding:5px 2px;
-    border-bottom:1.5px solid #EADCCB;
+    font-size:15px;
+    font-weight:600;
+    color:var(--text-primary);
+    padding:6px 4px;
+    border-bottom:1.5px solid transparent;
     width:100%;
     text-align:center;
+    transition:border-color 0.2s;
   }
-  .patient-input:focus{ outline:none; border-bottom-color:var(--rose-dark); }
-  .patient-input::placeholder{ color:var(--muted); font-weight:500; }
+  .patient-input:focus{ 
+    outline:none; 
+    border-bottom-color:var(--primary);
+  }
+  .patient-input::placeholder{ color:var(--text-tertiary); font-weight:500; }
 
   .region-cell{ display:flex; align-items:center; justify-content:center; }
   .region-input{
     border:none;
     background:transparent;
-    font-size:16px;
-    font-weight:700;
-    color:var(--text-main);
-    padding:5px 2px;
-    border-bottom:1.5px solid #EADCCB;
+    font-size:14px;
+    font-weight:500;
+    color:var(--text-primary);
+    padding:6px 4px;
+    border-bottom:1.5px solid transparent;
     width:100%;
     text-align:center;
+    transition:border-color 0.2s;
   }
-  .region-input:focus{ outline:none; border-bottom-color:var(--rose-dark); }
-  .region-input::placeholder{ color:var(--muted); font-weight:500; }
+  .region-input:focus{ 
+    outline:none; 
+    border-bottom-color:var(--primary);
+  }
+  .region-input::placeholder{ color:var(--text-tertiary); font-weight:500; }
 
   .doctor-cell{ display:flex; align-items:center; justify-content:center; padding:0 10px; }
-  .doctor-group{ display:flex; gap:5px; }
+  .doctor-group{ display:flex; gap:6px; }
   .btn-doctor{
-    width:36px;height:36px;
-    border-radius:50%;
-    border:2px solid var(--dcolor);
-    background:#fff;
-    color:var(--dcolor);
-    font-size:15px;
-    font-weight:800;
+    width:32px;height:32px;
+    border-radius:6px;
+    border:1.5px solid var(--border);
+    background:var(--bg);
+    color:var(--text-secondary);
+    font-size:13px;
+    font-weight:700;
     cursor:pointer;
+    transition:all 0.2s;
   }
-  .btn-doctor.sel{ background:var(--dcolor); color:#fff; }
+  .btn-doctor:hover{
+    border-color:var(--dcolor);
+    color:var(--dcolor);
+  }
+  .btn-doctor.sel{ 
+    background:var(--dcolor); 
+    color:#fff;
+    border-color:var(--dcolor);
+  }
 
   .zone{
-    border-radius:9px;
-    padding:6px;
+    border-radius:6px;
+    padding:8px;
     min-height:48px;
     display:flex;
     flex-direction:column;
-    gap:5px;
-    border:1.5px dashed transparent;
+    gap:6px;
+    border:1px solid transparent;
     justify-content:center;
+    background:var(--surface);
   }
-  .zone[data-status="before"]{ background:#F7F2EC; }
-  .zone[data-status="during"]{ background:#FBF0E6; }
-  .zone[data-status="done"]{ background:#F2ECE5; }
-  .zone.drag-over{ border-color:var(--rose-dark); background:#FFF9F2; }
+  .zone[data-status="before"]{ background:#FAFBFC; }
+  .zone[data-status="during"]{ background:#F8F9FB; }
+  .zone[data-status="done"]{ background:#FAFBFC; }
+  .zone.drag-over{ 
+    border-color:var(--primary);
+    background:var(--primary-light);
+  }
+  .zone.zone-overdue{ background:#FFECEC !important; }
 
-  .chip-row{ display:flex; flex-wrap:wrap; align-items:center; gap:10px; }
+  .chip-row{ display:flex; flex-wrap:wrap; align-items:center; gap:8px; }
   .elapsed-tag{
-    font-size:12px;
-    font-weight:700;
-    color:var(--tcolor);
+    font-size:11px;
+    font-weight:600;
+    color:var(--text-secondary);
     white-space:nowrap;
+    padding:4px 8px;
+    background:rgba(0,0,0,0.04);
+    border-radius:4px;
   }
-  .zone-overdue{ background:#EFA0A0 !important; }
+  .elapsed-tag.overdue{
+    color:#FF3333;
+    background:#FFECEC;
+  }
 
   .btn-quick{
     flex:0 0 auto;
-    height:42px;
-    border:none;
-    color:var(--tcolor);
-    background:transparent;
-    border-radius:16px;
-    font-size:15px;
-    font-weight:700;
-    padding:0 16px;
+    height:36px;
+    border:1px solid var(--border);
+    color:var(--text-secondary);
+    background:var(--bg);
+    border-radius:6px;
+    font-size:13px;
+    font-weight:600;
+    padding:0 12px;
     cursor:pointer;
     white-space:nowrap;
-    opacity:0.5;
-    transition:opacity .12s ease, background .12s ease, color .12s ease;
+    transition:all .15s ease;
   }
-  .btn-quick:hover{ opacity:1; background:var(--tcolor); color:#fff; }
+  .btn-quick:hover{ 
+    border-color:var(--tcolor);
+    color:var(--tcolor);
+  }
 
   .chip{
     display:flex;
     align-items:center;
-    height:42px;
-    gap:7px;
-    padding:0 14px;
-    border-radius:18px;
-    font-size:15.5px;
-    font-weight:700;
+    height:36px;
+    gap:6px;
+    padding:0 12px;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:600;
     cursor:grab;
     user-select:none;
     color:#fff;
     background:var(--tcolor);
     white-space:nowrap;
+    transition:filter 0.2s;
   }
-  .chip.dragging{ opacity:0.35; }
-  .chip .del{ cursor:pointer; opacity:0.8; font-size:13px; padding:4px 4px; }
+  .chip:active{ cursor:grabbing; }
+  .chip.dragging{ opacity:0.4; }
+  .chip .del{ cursor:pointer; opacity:0.8; font-size:12px; padding:3px 3px; }
   .chip .del:hover{ opacity:1; }
 
   .chip-split{
     display:flex;
     align-items:stretch;
-    height:42px;
+    height:36px;
     padding:0;
-    border-radius:18px;
+    border-radius:6px;
     overflow:hidden;
     cursor:grab;
     user-select:none;
     -webkit-user-select:none;
   }
+  .chip-split:active{ cursor:grabbing; }
   .chip-split .chip-label{
     background:var(--tcolor);
     color:#fff;
-    font-weight:700;
-    font-size:15px;
-    padding:0 12px;
+    font-weight:600;
+    font-size:13px;
+    padding:0 10px;
     display:flex;
     align-items:center;
     white-space:nowrap;
-    user-select:none;
-    -webkit-user-select:none;
   }
   .chip-split input{
     border:none;
     background:var(--tcolor);
-    font-size:14px;
-    padding:0 7px;
-    min-width:38px;
-    width:52px;
+    font-size:13px;
+    padding:0 6px;
+    min-width:32px;
+    width:48px;
     color:#fff;
+    font-family:inherit;
   }
   .chip-split input::placeholder{ color:rgba(255,255,255,0.7); }
-  .chip-split input:focus{ outline:none; background:var(--tcolor); filter:brightness(1.12); }
-  .chip-split input + input{ border-left:1px solid rgba(255,255,255,0.25); }
+  .chip-split input:focus{ outline:none; filter:brightness(1.1); }
+  .chip-split input + input{ border-left:1px solid rgba(255,255,255,0.2); }
   .chim-position-select{
     border:none;
     background:var(--tcolor);
-    font-size:13px;
-    font-weight:400;
+    font-size:12px;
+    font-weight:500;
     padding:0 6px;
     color:#fff;
     cursor:pointer;
-    border-left:1px solid rgba(255,255,255,0.25);
+    border-left:1px solid rgba(255,255,255,0.2);
+    font-family:inherit;
   }
   .chip-split .del{
     background:var(--tcolor);
     display:flex;
     align-items:center;
-    padding:0 13px;
+    padding:0 10px;
     cursor:pointer;
     color:rgba(255,255,255,0.85);
-    font-size:13px;
-    border-left:1px solid rgba(255,255,255,0.25);
+    font-size:12px;
+    border-left:1px solid rgba(255,255,255,0.2);
   }
   .chip-split .del:hover{ color:#fff; }
 
   .reset-cell{ display:flex; align-items:center; }
   .btn-reset{
     width:100%;
-    border:1.5px solid #D8C9BB;
+    border:1px solid var(--border);
     background:transparent;
-    color:var(--text-sub);
-    border-radius:8px;
-    font-size:13px;
-    font-weight:700;
-    padding:9px 2px;
+    color:var(--text-secondary);
+    border-radius:6px;
+    font-size:12px;
+    font-weight:600;
+    padding:8px 4px;
     cursor:pointer;
+    transition:all 0.2s;
   }
-  .btn-reset:hover{ border-color:var(--burgundy); color:#fff; background:var(--burgundy); }
+  .btn-reset:hover{ 
+    border-color:#FF3333;
+    color:#FF3333;
+    background:rgba(255,51,51,0.05);
+  }
 
   .legend{
-    margin-top:8px;
+    margin-top:20px;
+    padding:16px;
+    background:var(--primary-light);
+    border-radius:8px;
     display:flex;
     gap:16px;
-    font-size:13px;
-    color:var(--text-sub);
+    font-size:12px;
+    color:var(--text-secondary);
     flex-wrap:wrap;
   }
+  .legend span{ display:flex; align-items:center; }
+  .legend span::before{ content:"•"; margin-right:6px; color:var(--primary); }
 
   .waiting-header{
     display:flex;
     align-items:center;
     justify-content:space-between;
-    margin:18px 0 8px 0;
+    margin:28px 0 12px 0;
+    padding-bottom:12px;
+    border-bottom:1px solid var(--divider);
   }
   .waiting-header h2{
-    font-family:'Noto Sans KR', sans-serif;
-    font-size:18px;
-    font-weight:800;
-    color:var(--burgundy-deep);
+    font-size:20px;
+    font-weight:700;
+    color:var(--text-primary);
     margin:0;
   }
   .btn-add-waiting{
-    border:1.5px solid var(--burgundy-deep);
-    background:var(--burgundy-deep);
+    border:none;
+    background:var(--primary);
     color:#fff;
-    border-radius:8px;
-    font-size:14px;
-    font-weight:700;
-    padding:9px 16px;
+    border-radius:6px;
+    font-size:13px;
+    font-weight:600;
+    padding:10px 16px;
     cursor:pointer;
+    transition:background 0.2s;
   }
-  .btn-add-waiting:hover{ background:var(--burgundy); }
+  .btn-add-waiting:hover{ background:var(--primary-hover); }
 
   .waiting-row{
-    background:var(--ivory-card);
-    border:2px dashed var(--rose-mid);
-    border-radius:12px;
+    background:var(--bg);
+    border:1px solid var(--border);
+    border-radius:8px;
     display:grid;
     grid-template-columns: 40px 130px 100px 108px 1fr 150px;
     gap:14px;
     align-items:stretch;
-    padding:8px 12px;
+    padding:12px;
+    transition:all 0.2s;
   }
+  .waiting-row:hover{ box-shadow:0 2px 8px rgba(0,0,0,0.06); }
+  .waiting-row.ready{
+    border-color:var(--success);
+    background:#F0FFFB;
+  }
+
   .waiting-actions{
     display:flex;
     flex-direction:column;
     gap:6px;
     justify-content:center;
   }
-  .btn-copy{
-    border:1.5px solid var(--burgundy-deep);
-    background:transparent;
-    color:var(--burgundy-deep);
-    border-radius:8px;
+  .btn-copy, .btn-ready{
+    border:1px solid var(--border);
+    background:var(--bg);
+    color:var(--text-secondary);
+    border-radius:6px;
     font-size:12px;
-    font-weight:700;
-    padding:7px 6px;
+    font-weight:600;
+    padding:7px 8px;
     cursor:pointer;
+    transition:all 0.2s;
     white-space:nowrap;
   }
-  .btn-copy:hover{ background:var(--burgundy-deep); color:#fff; }
-
-  .btn-ready{
-    border:1.5px solid #8AA624;
-    background:transparent;
-    color:#8AA624;
-    border-radius:8px;
-    font-size:12px;
-    font-weight:700;
-    padding:7px 6px;
-    cursor:pointer;
+  .btn-copy:hover{ 
+    border-color:var(--primary);
+    color:var(--primary);
   }
-  .btn-ready.on{ background:#8AA624; color:#fff; }
-
-  .waiting-row.ready{
-    border-style:solid;
-    border-color:#8AA624;
-    background:#F5F8EA;
+  .btn-ready:hover{ 
+    border-color:var(--success);
+    color:var(--success);
+  }
+  .btn-ready.on{ 
+    background:var(--success);
+    color:#fff;
+    border-color:var(--success);
   }
 
   #toast{
@@ -380,40 +446,44 @@
     left:50%;
     bottom:32px;
     transform:translateX(-50%) translateY(20px);
-    background:var(--burgundy-deep);
+    background:var(--text-primary);
     color:#fff;
-    font-weight:700;
-    font-size:14px;
-    padding:12px 22px;
-    border-radius:999px;
-    box-shadow:0 8px 20px rgba(0,0,0,0.25);
+    font-weight:600;
+    font-size:13px;
+    padding:12px 20px;
+    border-radius:6px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.15);
     opacity:0;
     pointer-events:none;
     transition:opacity .2s ease, transform .2s ease;
     z-index:9999;
   }
   #toast.show{ opacity:1; transform:translateX(-50%) translateY(0); }
+
   .waiting-handle{
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:20px;
-    color:var(--rose-dark);
+    font-size:16px;
+    color:var(--text-tertiary);
     cursor:grab;
     touch-action:none;
     user-select:none;
+    transition:color 0.2s;
   }
+  .waiting-handle:active{ cursor:grabbing; color:var(--primary); }
+
   .bed-num-badge.drop-target{
-    background:var(--rose-dark) !important;
+    background:var(--primary) !important;
     color:#fff !important;
-    transform:scale(1.15);
+    transform:scale(1.1);
   }
-  .waiting-treat-zone{ display:flex; flex-direction:column; gap:5px; justify-content:center; }
+  .waiting-treat-zone{ display:flex; flex-direction:column; gap:6px; justify-content:center; }
 
   .bed-row.drop-target{
-    border-color:var(--burgundy-deep) !important;
-    background:#FFF3E8 !important;
-    box-shadow:0 0 0 3px rgba(122,31,61,0.18);
+    border-color:var(--primary) !important;
+    background:var(--primary-light) !important;
+    box-shadow:0 0 0 2px rgba(0,82,255,0.1);
   }
 
   .drag-ghost{
@@ -421,14 +491,20 @@
     z-index:9999;
     pointer-events:none;
     transform:translate(-50%,-140%);
-    background:var(--burgundy-deep);
+    background:var(--text-primary);
     color:#fff;
-    font-weight:800;
-    font-size:14px;
-    padding:8px 14px;
-    border-radius:14px;
-    box-shadow:0 6px 16px rgba(0,0,0,0.25);
+    font-weight:600;
+    font-size:13px;
+    padding:8px 12px;
+    border-radius:6px;
+    box-shadow:0 6px 16px rgba(0,0,0,0.12);
     white-space:nowrap;
+  }
+
+  @media (max-width: 1200px) {
+    body { padding: 16px 20px; }
+    .col-headers { grid-template-columns: 40px 100px 80px 90px 1fr 0.8fr 1fr 50px; gap: 10px; padding: 0 8px; }
+    .bed-row, .waiting-row { gap: 10px; padding: 10px; }
   }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -455,35 +531,34 @@
 
 <div class="waiting-header">
   <h2>대기 환자</h2>
-  <button class="btn-add-waiting" id="addWaitingBtn">+ 대기 환자 추가</button>
+  <button class="btn-add-waiting" id="addWaitingBtn">+ 추가</button>
 </div>
 <div class="board" id="waitingBoard"></div>
 
 <div class="legend">
-  <span>· 회색 점선 바 = 비활성 베드, 클릭하면 시작</span>
-  <span>· 칩 드래그로 이동/순서 변경</span>
-  <span>· 대기 환자 왼쪽 손잡이(⠿)를 베드 번호로 끌면 그 베드에 배정</span>
+  <span>회색 점선 바 = 비활성 베드, 클릭하여 시작</span>
+  <span>칩 드래그로 이동/순서 변경</span>
+  <span>대기 환자 손잡이(⠿)를 베드로 끌어서 배정</span>
 </div>
 
 <script>
-// ↓↓↓ Supabase 프로젝트 정보로 교체하세요 (Settings → API) ↓↓↓
 const SUPABASE_URL = 'https://bvniztqmmjggmmtnkzic.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJ2bml6dHFtbWpnZ21tdG5remljIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI4ODEzMTgsImV4cCI6MjA5ODQ1NzMxOH0.KETeV-bEpHDzpUgPRdchqHDhuRh6EMJacDNrUu_gA8A';
 const ROW_ID = 'main';
 const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 const BED_COUNT = 14;
 const DOCTORS = [
-  { id:'K', color:'var(--doc-k)' },
-  { id:'J', color:'var(--doc-j)' },
-  { id:'C', color:'var(--doc-c)' },
+  { id:'K', color:'#5B5BFF' },
+  { id:'J', color:'#FF6B35' },
+  { id:'C', color:'#00C48C' },
 ];
 
 const TREATMENT_ORDER = ['충격파','추나','추나(환자복)','BC','간접구','습부2','습부1','건부','침(전)','침','약침','I','핫팩','돔','JB'];
 const TREATMENT_COLORS = {
-  'JB':'#8E6C88', '돔':'#5C6B8A', '핫팩':'#C1652F', 'I':'#4C7A96', '약침':'#7A1F3D',
-  '침':'#2F6B5E', '침(전)':'#2F6B5E',
-  '건부':'#8AA624', '습부1':'#8AA624', '습부2':'#8AA624', '간접구':'#C99A3E',
-  '추나':'#B08060', '추나(환자복)':'#B08060', '충격파':'#4A0F25', 'BC':'#5C6B73'
+  'JB':'#7C8FD4', '돔':'#5B7C99', '핫팩':'#FF6B35', 'I':'#3B8DCC', '약침':'#0052FF',
+  '침':'#00C48C', '침(전)':'#00C48C',
+  '건부':'#88BB00', '습부1':'#88BB00', '습부2':'#88BB00', '간접구':'#D4A574',
+  '추나':'#A67C52', '추나(환자복)':'#A67C52', '충격파':'#1A1D29', 'BC':'#5B6B81'
 };
 const FORM_CONFIG = {
   '핫팩': ['부위'],
@@ -493,12 +568,14 @@ const FORM_CONFIG = {
 const DEFAULT_ON_ACTIVATE = ['BC','습부2','침(전)','I','핫팩'];
 const CHIM_BASES = ['침','침(전)'];
 const CHIM_POSITIONS = ['앞침','엎침','옆침/좌','옆침/우'];
+
 function treatmentLabel(t){
   if(CHIM_BASES.includes(t.base) && t.extra && t.extra['자세']){
     return t.extra['자세'] + (t.base === '침(전)' ? '(전)' : '');
   }
   return t.base;
 }
+
 function buildPositionSelect(treatment, onChange){
   const sel = document.createElement('select');
   sel.className = 'chim-position-select';
@@ -524,6 +601,7 @@ function buildPositionSelect(treatment, onChange){
 function emptyBed(id){
   return { id, active:false, patient:'', region:'', doctor:null, treatments:[] };
 }
+
 function defaultState(){
   const beds = [];
   for(let i=1;i<=BED_COUNT;i++) beds.push(emptyBed(i));
@@ -533,8 +611,11 @@ function defaultState(){
 let state = defaultState();
 let waitingList = [];
 let seq = 1;
+
 function newId(){ return 't' + (seq++) + '-' + Date.now(); }
+
 const __measureCanvas = document.createElement('canvas');
+
 function autoGrowInput(inp){
   const ctx = __measureCanvas.getContext('2d');
   const cs = getComputedStyle(inp);
@@ -543,6 +624,7 @@ function autoGrowInput(inp){
   const textWidth = ctx.measureText(text).width;
   inp.style.width = Math.max(38, textWidth + 34) + 'px';
 }
+
 function emptyWaitingPatient(){
   const w = { id:newId(), patient:'', region:'', doctor:null, treatments:[], ready:false };
   DEFAULT_ON_ACTIVATE.forEach(name=>{
@@ -566,7 +648,7 @@ let boardBusy = false;
 let dragState = null;
 
 async function loadState(){
-  if(boardBusy) return; // 입력/드래그 중에는 새로고침으로 화면이 바뀌지 않도록 건너뜀
+  if(boardBusy) return;
   try{
     const { data, error } = await sb
       .from('board_state')
@@ -602,7 +684,6 @@ async function saveState(){
   }
 }
 
-// 다른 기기에서 저장하면 실시간으로 이 화면도 자동 반영
 sb
   .channel('board_state_changes')
   .on('postgres_changes', { event:'*', schema:'public', table:'board_state', filter:`id=eq.${ROW_ID}` }, ()=>{
@@ -763,7 +844,7 @@ function renderWaiting(){
 
 function makeWaitingChip(w, treatment){
   const fields = FORM_CONFIG[treatment.base];
-  const tcolor = TREATMENT_COLORS[treatment.base] || '#7A1F3D';
+  const tcolor = TREATMENT_COLORS[treatment.base] || '#0052FF';
   const chip = document.createElement('div');
   chip.dataset.id = treatment.id;
   chip.dataset.waitingId = w.id;
@@ -885,7 +966,6 @@ function render(){
     row.className = 'bed-row';
     row.dataset.bed = bed.id;
 
-    // 베드 번호: 짧게 탭 = 활성화 토글, 끌면(드래그) = 다른 베드로 환자 이동
     const numCell = document.createElement('div');
     numCell.className = 'bed-num';
     const badge = document.createElement('div');
@@ -908,7 +988,7 @@ function render(){
       const onUp = ev=>{
         document.removeEventListener('pointermove', onMove);
         document.removeEventListener('pointerup', onUp);
-        if(!started) toggleActivate(bed); // 움직이지 않았으면 그냥 클릭으로 처리
+        if(!started) toggleActivate(bed);
       };
       document.addEventListener('pointermove', onMove);
       document.addEventListener('pointerup', onUp);
@@ -916,7 +996,6 @@ function render(){
     numCell.appendChild(badge);
     row.appendChild(numCell);
 
-    // 환자명
     const patientCell = document.createElement('div');
     patientCell.className = 'patient-cell';
     const patientInput = document.createElement('input');
@@ -927,7 +1006,6 @@ function render(){
     patientCell.appendChild(patientInput);
     row.appendChild(patientCell);
 
-    // 부위
     const regionCell = document.createElement('div');
     regionCell.className = 'region-cell';
     const regionInput = document.createElement('input');
@@ -938,7 +1016,6 @@ function render(){
     regionCell.appendChild(regionInput);
     row.appendChild(regionCell);
 
-    // 담당 K/J/C
     const doctorCell = document.createElement('div');
     doctorCell.className = 'doctor-cell';
     const doctorGroup = document.createElement('div');
@@ -957,25 +1034,21 @@ function render(){
     doctorCell.appendChild(doctorGroup);
     row.appendChild(doctorCell);
 
-    // 치료 전 / 치료 중 / 치료 완료
     ['before','during','done'].forEach(status=>{
       const zone = document.createElement('div');
       zone.className = 'zone';
       zone.dataset.status = status;
       zone.dataset.bed = bed.id;
 
-
       if(status === 'before'){
         const beforeItems = bed.treatments.filter(t=>t.status==='before');
         const addedNames = new Set(beforeItems.map(t=>t.base));
 
-        // 윗줄: 이미 선택된 치료(칩) — 실제 저장된 순서 그대로 (드래그로 바꾼 순서 유지)
         const chipRow = document.createElement('div');
         chipRow.className = 'chip-row';
         beforeItems.forEach(t=> chipRow.appendChild(makeChip(bed, t)));
         if(chipRow.children.length) zone.appendChild(chipRow);
 
-        // 아랫줄: 아직 선택 안 된 치료(버튼)
         const btnRow = document.createElement('div');
         btnRow.className = 'chip-row';
         TREATMENT_ORDER.forEach(name=>{
@@ -1003,7 +1076,7 @@ function render(){
             if(mins >= 8) hasOverdue = true;
             const tag = document.createElement('span');
             tag.className = 'elapsed-tag' + (mins >= 8 ? ' overdue' : '');
-            tag.style.setProperty('--tcolor', TREATMENT_COLORS[t.base] || '#7A1F3D');
+            tag.style.setProperty('--tcolor', TREATMENT_COLORS[t.base] || '#0052FF');
             tag.dataset.started = t.startedAt;
             tag.textContent = elapsedText(t.startedAt);
             chipRow.appendChild(tag);
@@ -1016,7 +1089,6 @@ function render(){
       row.appendChild(zone);
     });
 
-    // 초기화
     const resetCell = document.createElement('div');
     resetCell.className = 'reset-cell';
     const resetBtn = document.createElement('button');
@@ -1032,7 +1104,7 @@ function render(){
 
 function makeChip(bed, treatment){
   const fields = FORM_CONFIG[treatment.base];
-  const tcolor = TREATMENT_COLORS[treatment.base] || '#7A1F3D';
+  const tcolor = TREATMENT_COLORS[treatment.base] || '#0052FF';
 
   const chip = document.createElement('div');
   chip.dataset.status = treatment.status;
@@ -1176,9 +1248,9 @@ function reorderTreatment(draggedId, targetBedId, targetTreatId, insertBefore, t
   saveState(); renderAll();
 }
 
-renderAll(); // 서버 응답 기다리지 않고 일단 기본 화면부터 표시
-loadState(); // 이후 실제 저장된 데이터로 갱신
-setInterval(loadState, 10000); // 실시간이 끊겨도 10초마다 안전망으로 재확인
+renderAll();
+loadState();
+setInterval(loadState, 10000);
 
 const boardEl = document.getElementById('board');
 boardEl.addEventListener('focusin', ()=>{ boardBusy = true; });
@@ -1191,8 +1263,8 @@ boardEl.addEventListener('mousedown', ()=>{
   window.__busyTimer = setTimeout(()=>{ boardBusy = false; }, 400);
 });
 
-// 드래그 중 손가락/커서를 따라다니는 안내 라벨
 let ghostEl = null;
+
 function showDragGhost(text, x, y){
   removeDragGhost();
   ghostEl = document.createElement('div');
@@ -1201,9 +1273,11 @@ function showDragGhost(text, x, y){
   document.body.appendChild(ghostEl);
   moveDragGhost(x, y);
 }
+
 function moveDragGhost(x, y){
   if(ghostEl){ ghostEl.style.left = x + 'px'; ghostEl.style.top = y + 'px'; }
 }
+
 function removeDragGhost(){
   if(ghostEl){ ghostEl.remove(); ghostEl = null; }
 }
@@ -1223,7 +1297,7 @@ function buildTreatmentSummary(rawTreatments, region){
   const chimIdx = treatments.findIndex(t=>t.base==='침(전)');
   const out = [];
   for(let i=0;i<treatments.length;i++){
-    if(i===yakIdx && chimIdx>-1) continue; // 침(전)에 합쳐서 표시
+    if(i===yakIdx && chimIdx>-1) continue;
     const t = treatments[i];
     if(i===chimIdx && yakIdx>-1){
       const yak = treatments[yakIdx];
@@ -1282,7 +1356,6 @@ async function copyWaitingSummary(w, btn){
   }catch(e){ copied = false; }
 
   if(!copied){
-    // 클립보드 API를 못 쓰는 환경 대비: 숨긴 textarea로 대체 복사
     try{
       const ta = document.createElement('textarea');
       ta.value = text;
@@ -1299,7 +1372,7 @@ async function copyWaitingSummary(w, btn){
   if(copied){
     showToast('복사되었습니다');
   }else{
-    showToast('복사 실패 - 아래 텍스트를 직접 복사하세요');
+    showToast('복사 실패');
     alert(text);
   }
 }
@@ -1392,6 +1465,7 @@ function endDrag(e){
     moveTreatmentToZone(treatId, parseInt(zoneEl.dataset.bed), zoneEl.dataset.status);
   }
 }
+
 document.addEventListener('pointerup', endDrag);
 document.addEventListener('pointercancel', ()=>{
   dragState = null;
